@@ -1,1 +1,1 @@
-bin\lua.exe src\luaexcel-test.lua
+bin\lua.exe src\main.lua

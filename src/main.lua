@@ -1,7 +1,13 @@
-package.cpath = package.cpath..';./lib/?.dll;./bin/?.dll'
+package.cpath = package.cpath..';./src/?.lua;./bin/?.dll'
 
 require 'luacom'
 require 'winapi'
 require 'luaiconv'
 
-print 'hello'
+local Excel = require 'Excel'
+
+function main( )
+	local doc = Excel.new()
+	doc:open('t.xlsx')
+	doc:close()
+end
