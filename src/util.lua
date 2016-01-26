@@ -1,4 +1,3 @@
-package.cpath = package.cpath..';./lib/?.dll;./bin/?.dll'
 
 require 'luacom'
 require 'winapi'
@@ -6,7 +5,7 @@ require 'luaiconv'
 
 -------------------------------------------------------------
 -- 编码转换
-local function createIconv(to, from)  
+function createIconv(to, from)  
 	local cd = iconv.new(to, from)  
 	return function(txt)  
 	   return cd:iconv(txt)  

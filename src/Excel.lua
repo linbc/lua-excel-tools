@@ -1,4 +1,6 @@
 
+local Sheet = require 'Sheet'
+
 -------------------------------------------------------------
 -- class Excel
 local Excel = {}
@@ -38,7 +40,7 @@ function Excel:getSheet(name)
 	local sheet = e:Next()
 	while sheet do
 		if sheet.Name == name then
-			return sheet
+			return Sheet.new(sheet)
 		end
 		sheet = e:Next()
 	end
