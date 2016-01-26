@@ -2,7 +2,7 @@
 -- function
 
 --数组倒序排列
-local function orderByDesc( input )
+function table.orderByDesc( input )
 	local output = {}
 	local count = #input
 	while count > 0 do
@@ -15,7 +15,7 @@ end
 --进制转换，英文不行只好用拼音
 --@dec 10进制数据，好吧，只要是数字就呆以了
 --@x 进制，最常见的当然是二、八、十六、进制
-local function _Dec2X( dec, x )
+function math.dec2X( dec, x )
 	--计算结果存储在这里
 	local new_number = {}
 
@@ -45,24 +45,23 @@ end
 
 --将某个数据转成X进制
 --以 9527，10进制为例，{7, 2, 5, 9}
-local function _numberTable2X(  number_tbl,x )
+function math.numberTable2X(  number_tbl,x )
 	local result = 0
 	for i,v in ipairs(number_tbl) do
-		print(result,x, i, v)
 		result = result + v*math.pow(x, i - 1)
 	end
 	return result
 end
 
-local function test_Dec2X ()
-	local kTestNumber = 9527
-	local n1 = _Dec2X(kTestNumber, 10)
-	-- table.foreach(n1, function ( _,v )
-	-- 	print(v)
-	-- end)
-	assert(kTestNumber == _numberTable2X(n1, 10))
-end
-test_Dec2X()
+-- local function test_Dec2X ()
+-- 	local kTestNumber = 9527
+-- 	local n1 = math.dec2X(kTestNumber, 10)
+-- 	-- table.foreach(n1, function ( _,v )
+-- 	-- 	print(v)
+-- 	-- end)
+-- 	assert(kTestNumber == math.numberTable2X(n1, 10))
+-- end
+-- test_Dec2X()
 
 -------------------------------------------------------------
 -- class Sheet
@@ -76,7 +75,57 @@ function Sheet.new(ptr)
 	return o
 end
 
+--AA相当于10进制27
+function Sheet:getColumnNumber( s )
+	local number_tbl = {}
+	for k,_ in string.gmatch(s, '%u') do 
+		local n = string.byte(k) - string.byte('A') + 1
+		assert(n <= 26 and n > 0)
+		table.insert(number_tbl, n) 
+	end
+	number_tbl = table.orderByDesc(number_tbl)
+	return math.numberTable2X(number_tbl, 26)
+end
+
+function Sheet:getColumnString( num )
+	--由于这个26进制比较奇怪,如果以时间举例就是0点不叫0点而叫24点
+	--所以在计算进制前先-1，好了以后个位补1
+	local number_tbl = math.dec2X(num - 1, 26)
+	number_tbl[1] = number_tbl[1] + 1
+
+	for i,v in ipairs(number_tbl) do		
+		number_tbl[i] = string.char(string.byte('A') + v -1 )
+	end
+	--倒序一下
+	number_tbl = table.orderByDesc(number_tbl)
+	--字符串拼接一下
+	local s = ''
+	for _,v in ipairs(number_tbl) do
+		s = s .. v
+	end
+	return s
+end
+
+--测试
+assert(Sheet.getColumnNumber(nil, 'A') == 1)
+assert(Sheet.getColumnNumber(nil, 'Z') == 26)
+assert(Sheet.getColumnNumber(nil, 'AA') == 27)
+assert(Sheet.getColumnNumber(nil, 'IV') == 256)
+assert(Sheet.getColumnString(nil, 1) == 'A')
+assert(Sheet.getColumnString(nil, 27) == 'AA')
+assert(Sheet.getColumnString(nil, 256) == 'IV')
+assert(Sheet.getColumnString(nil, 26) == 'Z')
+
+--@startRange 起点格子编号：如AB189, AB列-189行
+--@width 宽度几格
+--@height 高度
 function Sheet:getRange(startRange, width, height)
+	assert(type(startRange) == 'string')
+	--获得起点行号，及起点的列编号
+	local startRow = string.gsub(startRange, '%u+', '')
+	local startColumn = string.gsub(startRange, '%d+', '')
+	--列编号相当于26进制的数字，我们把他转成10进制整数便于运算
+
 end
 
 return Sheet
