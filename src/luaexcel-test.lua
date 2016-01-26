@@ -1,4 +1,4 @@
-
+package.cpath = package.cpath..';./lib/?.dll;./bin/?.dll'
 
 require 'luacom'
 require 'winapi'
@@ -24,3 +24,4 @@ function clearExecl()
         P:kill()
     end
 end
+
