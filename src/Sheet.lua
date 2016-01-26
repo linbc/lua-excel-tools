@@ -116,16 +116,26 @@ assert(Sheet.getColumnString(nil, 27) == 'AA')
 assert(Sheet.getColumnString(nil, 256) == 'IV')
 assert(Sheet.getColumnString(nil, 26) == 'Z')
 
+function Sheet:getRangeString( startRange, width, height )
+	assert(type(startRange) == 'string')
+	--获得起点行号，及起点的列编号
+	local startRow = string.gsub(startRange, '%d+', '')
+	local startColumn = string.gsub(startRange, '%u+', '')
+	--列编号相当于26进制的数字，我们把他转成10进制整数便于运算
+	startColumn = self:getColumnNumber(startColumn)
+	local endRow, endColumn = startRow + height, startColumn + width
+	--转成字母形式
+	endColumn = self:getColumnString(endColumn)
+
+	return startRange..':'..endColumn..endRow
+end
+
 --@startRange 起点格子编号：如AB189, AB列-189行
 --@width 宽度几格
 --@height 高度
 function Sheet:getRange(startRange, width, height)
-	assert(type(startRange) == 'string')
-	--获得起点行号，及起点的列编号
-	local startRow = string.gsub(startRange, '%u+', '')
-	local startColumn = string.gsub(startRange, '%d+', '')
-	--列编号相当于26进制的数字，我们把他转成10进制整数便于运算
-
+	local range = sheet:Range(self:getRangeString(startRange, width, height))
+	return range.Value2
 end
 
 return Sheet
