@@ -68,13 +68,7 @@ end
 local Sheet = {}
 
 
-function Sheet.new(ptr)
-	for row=1, 30 do
-	  for col=1, 30 do
-	    ptr.Cells(row, col).Value2 = math.floor(math.random() * 100)
-	  end
-	end
-
+function Sheet.new(ptr)	
 	local o = {sheet = ptr}
 	setmetatable(o, Sheet)
 	Sheet.__index = Sheet
@@ -151,7 +145,19 @@ function Sheet:getRange(startRange, width, height)
 end
 
 --传入一个table设置到相应的格子上面
-function Sheet:setRange( startRange, data )
+function Sheet:setRange( startRange, width, height, data )
+	startRange = startRange or 'A1'
+
+	--获得起点行号，及起点的列编号
+	local startRow = string.gsub(startRange, '%u+', '')
+	local startColumn = string.gsub(startRange, '%d+', '')
+
+	--设置值,注意空的情况
+	for i=1, width do
+	  for j=1, height do
+	    ptr.Cells(startRow + i, startColumn + j).Value2 = data[i][j]
+	  end
+	end
 end
 
 function Sheet:getUseRange()
