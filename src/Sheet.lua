@@ -68,8 +68,8 @@ end
 local Sheet = {}
 
 
-function Sheet.new(ptr)	
-	local o = {sheet = ptr}
+function Sheet.new(ptr, excel)	
+	local o = {sheet = ptr, owner = excel}
 	setmetatable(o, Sheet)
 	Sheet.__index = Sheet
 	return o
@@ -134,29 +134,64 @@ end
 --@startRange 起点格子编号：如AB189, AB列-189行
 --@width 宽度几格
 --@height 高度
-function Sheet:getRange(startRange, width, height)
-	--如果没有输入这个参数,默认使用最大
+function Sheet:getRange(startRange, width, height)	
 	startRange = startRange or 'A1'
 	width = width or self.sheet.Usedrange.columns.count
 	height = height or self.sheet.Usedrange.Rows.count
-
-	local range = self.sheet:Range(self:getRangeString(startRange, width, height))
-	return range.Value2
-end
-
---传入一个table设置到相应的格子上面
-function Sheet:setRange( startRange, width, height, data )
-	startRange = startRange or 'A1'
+	--如果格子选太多会导致crash,所以这里必须分页
 
 	--获得起点行号，及起点的列编号
 	local startRow = string.gsub(startRange, '%u+', '')
 	local startColumn = string.gsub(startRange, '%d+', '')
 
+	--分页的大小
+	local kStep = 100
+	local ranges = {}
+	for i=0,height,kStep do
+		local cellStr = startColumn..(tonumber(startRow) + #ranges*kStep)
+		local row_count = (i+kStep > height) and (height-i) or kStep
+		if row_count > 0 then
+			print(cellStr, i, row_count)
+			local range = self.sheet:Range(self:getRangeString(cellStr, width, row_count))
+			table.insert(ranges, range)
+		end
+	end	
+	
+	--return range.Value2
+end
+
+function Sheet:pasteTable( activate_cell,str_data )
+	--写到剪粘板,然后粘贴即可
+	local content = table.concat(str_data, '\r\n')
+	winapi.set_clipboard(content)
+	self.sheet:Range(activate_cell):Activate()
+	self.sheet:Paste()
+	--保存一下防止失败
+	--self.owner:save()
+end
+
+--传入一个table设置到相应的格子上面
+function Sheet:setRange( dstRange, data, row_count, column_count )
+	dstRange = dstRange or 'A1'	
+
+	--获得起点行号，及起点的列编号
+	local startRow = string.gsub(dstRange, '%u+', '')
+	local startColumn = string.gsub(dstRange, '%d+', '')
 	--设置值,注意空的情况
-	for i=1, width do
-	  for j=1, height do
-	    ptr.Cells(startRow + i, startColumn + j).Value2 = data[i][j]
-	  end
+	local stringbuilder = {}
+	for i=1, row_count do
+		-- local row = data[i]
+		-- for j=1, column_count do			
+	 --    	self.sheet.Cells(startRow + i -1, self:getColumnNumber(startColumn) + j -1).Value2 = row[j]
+	 --  	end
+	  	table.insert(stringbuilder, table.concat(data[i], '\t'))
+	  	--本来要做分页的，其实没有必要,那不然就分10000吧
+	  	if #stringbuilder >= 10000 or (i == row_count) then	  		
+	  		local rowIndex = startRow + i - #stringbuilder
+	  		local activate_cell = startColumn .. rowIndex
+			self:pasteTable( activate_cell, stringbuilder)
+			stringbuilder = {}
+	  	end
 	end
 end
 

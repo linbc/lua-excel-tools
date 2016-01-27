@@ -23,7 +23,7 @@ function Excel:open(path, visible)
 	assert(excel)
 	self.excel = excel
 	
-	excel.Application.DisplayAlerts = false
+	excel.Application.DisplayAlerts = true
 	local book = excel.WorkBooks:Open(G2U(path),nil,ReadOnly)
 	--book.Saved = false
 	self.book = book
@@ -51,7 +51,7 @@ function Excel:getSheet(name)
 	local sheet = e:Next()
 	while sheet do
 		if sheet.Name == name then
-			return Sheet.new(sheet)
+			return Sheet.new(sheet, self)
 		end
 		sheet = e:Next()
 	end
