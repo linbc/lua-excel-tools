@@ -69,6 +69,12 @@ local Sheet = {}
 
 
 function Sheet.new(ptr)
+	for row=1, 30 do
+	  for col=1, 30 do
+	    ptr.Cells(row, col).Value2 = math.floor(math.random() * 100)
+	  end
+	end
+
 	local o = {sheet = ptr}
 	setmetatable(o, Sheet)
 	Sheet.__index = Sheet
@@ -139,9 +145,13 @@ function Sheet:getRange(startRange, width, height)
 	startRange = startRange or 'A1'
 	width = width or self.sheet.Usedrange.columns.count
 	height = height or self.sheet.Usedrange.Rows.count
-	
+
 	local range = self.sheet:Range(self:getRangeString(startRange, width, height))
 	return range.Value2
+end
+
+--传入一个table设置到相应的格子上面
+function Sheet:setRange( startRange, data )
 end
 
 function Sheet:getUseRange()

@@ -12,21 +12,29 @@ function Excel.new()
 	return o
 end
 
-function Excel:open(path)
+function Excel:open(path, visible)
 	if not self:isExist(path) then
 		return false
 	end
 	
 	local excel = luacom.GetObject('Excel.Application') or luacom.CreateObject('Excel.Application')
+	--是否显示excel窗口
+	excel.Visible = visible
 	assert(excel)
 	self.excel = excel
 	
 	excel.Application.DisplayAlerts = false
 	local book = excel.WorkBooks:Open(G2U(path),nil,ReadOnly)
-	book.Saved = false
+	--book.Saved = false
 	self.book = book
 	
 	return true
+end
+
+function Excel:save( )
+	if self.book then
+		self.book:Save()
+	end
 end
 
 function Excel:close()
