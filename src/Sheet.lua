@@ -119,8 +119,8 @@ assert(Sheet.getColumnString(nil, 26) == 'Z')
 function Sheet:getRangeString( startRange, width, height )
 	assert(type(startRange) == 'string')
 	--获得起点行号，及起点的列编号
-	local startRow = string.gsub(startRange, '%d+', '')
-	local startColumn = string.gsub(startRange, '%u+', '')
+	local startRow = string.gsub(startRange, '%u+', '')
+	local startColumn = string.gsub(startRange, '%d+', '')
 	--列编号相当于26进制的数字，我们把他转成10进制整数便于运算
 	startRow = tonumber(startRow)
 	startColumn = self:getColumnNumber(startColumn)
@@ -135,12 +135,17 @@ end
 --@width 宽度几格
 --@height 高度
 function Sheet:getRange(startRange, width, height)
+	--如果没有输入这个参数,默认使用最大
+	startRange = startRange or 'A1'
+	width = width or self.sheet.Usedrange.columns.count
+	height = height or self.sheet.Usedrange.Rows.count
+	
 	local range = self.sheet:Range(self:getRangeString(startRange, width, height))
 	return range.Value2
 end
 
 function Sheet:getUseRange()
-	return self. sheet.Usedrange.Rows.count,
+	return self.sheet.Usedrange.Rows.count,
 		self.sheet.Usedrange.columns.count
 end
 

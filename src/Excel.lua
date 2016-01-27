@@ -13,7 +13,9 @@ function Excel.new()
 end
 
 function Excel:open(path)
-	assert(self:isExist(path))
+	if not self:isExist(path) then
+		return false
+	end
 	
 	local excel = luacom.GetObject('Excel.Application') or luacom.CreateObject('Excel.Application')
 	assert(excel)
@@ -24,6 +26,7 @@ function Excel:open(path)
 	book.Saved = false
 	self.book = book
 	
+	return true
 end
 
 function Excel:close()
