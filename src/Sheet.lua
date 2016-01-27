@@ -148,15 +148,15 @@ function Sheet:getRange(startRange, width, height)
 	local data = {}
 
 	--分页的大小
-	local kStep = 100
+	local kStep = 200
 	local ranges = {}
 	for i=0,height,kStep do
 		local cellStr = startColumn..(tonumber(startRow) + #ranges*kStep)
 		local row_count = (i+kStep > height) and (height-i) or kStep
 		if row_count > 0 then
-			print(cellStr, i, row_count)
+--			print(cellStr, i, row_count)
 			local range = self.sheet:Range(self:getRangeString(cellStr, width, row_count))
---			table.insert(ranges, {row_count, range})
+			table.insert(ranges, {row_count, range})
 			for j=1,row_count do
 				local row = {}
 				for k=1,width do
