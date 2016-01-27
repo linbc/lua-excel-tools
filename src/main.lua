@@ -30,7 +30,7 @@ function main( )
 --	doc:save()
 
 	--测试一下读取数据后打印输出
-	local data = sheet:getRange('A1',10, 5000)
+	local data = sheet:getRange('A1',10, 1000)
 	for i=1,1000 do
 		local row = data[i]
 		print('row:	',i, row and row[1] or nil,row and row[2] or nil)
