@@ -144,6 +144,9 @@ function Sheet:getRange(startRange, width, height)
 	local startRow = string.gsub(startRange, '%u+', '')
 	local startColumn = string.gsub(startRange, '%d+', '')
 
+	--把所有的数据组织成一张大表
+	local data = {}
+
 	--分页的大小
 	local kStep = 100
 	local ranges = {}
@@ -153,11 +156,18 @@ function Sheet:getRange(startRange, width, height)
 		if row_count > 0 then
 			print(cellStr, i, row_count)
 			local range = self.sheet:Range(self:getRangeString(cellStr, width, row_count))
-			table.insert(ranges, range)
+--			table.insert(ranges, {row_count, range})
+			for j=1,row_count do
+				local row = {}
+				for k=1,width do
+					row[k] = range.Value2[j][k]
+				end
+				table.insert(data, row)
+			end
 		end
 	end	
-	
-	--return range.Value2
+
+	return data
 end
 
 function Sheet:pasteTable( activate_cell,str_data )
