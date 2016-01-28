@@ -154,9 +154,8 @@ function Sheet:getRange(startRange, width, height)
 		local cellStr = startColumn..(tonumber(startRow) + #ranges*kStep)
 		local row_count = (i+kStep > height) and (height-i) or kStep
 		if row_count > 0 then
---			print(cellStr, i, row_count)
 			local range = self.sheet:Range(self:getRangeString(cellStr, width, row_count))
-			range:Copy()
+--			range:Copy()
 			table.insert(ranges, {row_count, range})
 			for j=1,row_count do
 				local row = {}
