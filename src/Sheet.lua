@@ -139,6 +139,7 @@ function Sheet:getRange(startRange, width, height)
 	width = width or self.sheet.Usedrange.columns.count
 	height = height or self.sheet.Usedrange.Rows.count
 	--如果格子选太多会导致crash,所以这里必须分页
+	--TODO:这种方式性能还是不行，应该可以借助剪贴板,然后分割文本的方式提高性能
 
 	--获得起点行号，及起点的列编号
 	local startRow = string.gsub(startRange, '%u+', '')
