@@ -188,12 +188,11 @@ function Sheet:pasteTable( activate_cell,str_data )
 	--写到剪粘板,然后粘贴即可
 	local content = table.concat(str_data, '\r\n')
 	winapi.set_clipboard(content)
-print('activate_cell', activate_cell)	
---print(content)
-	local range = self.sheet:Range(activate_cell)
-	local cell = range:Offset(0, 0)
-	cell:Select()
-	--self.sheet:Range(activate_cell):Activate()
+	self.sheet:Activate()
+	--local range = self.sheet:Range(activate_cell)
+	--local cell = range:Offset(0, 0)
+	--cell:Select()
+	self.sheet:Range(activate_cell):Activate()
 	self.sheet:Paste()
 	--保存一下防止失败
 	--self.owner:save()
@@ -244,12 +243,12 @@ end
 --从指定的位置开始设置值
 function Sheet:setColumn(startRange, data)
 	--获得起点行号，及起点的列编号
-	--return self:pasteTable(startRange, data)
-	local startRow = string.gsub(startRange, '%u+', '')
-	local startColumn = string.gsub(startRange, '%d+', '')
-	for i=1,#data do
-		self.sheet.Cells(tonumber(startRow) + i -1, self:getColumnNumber(startColumn)).Value2 = data[i]
-	end
+	return self:pasteTable(startRange, data)
+	--local startRow = string.gsub(startRange, '%u+', '')
+	--local startColumn = string.gsub(startRange, '%d+', '')
+	--for i=1,#data do
+	--	self.sheet.Cells(tonumber(startRow) + i -1, self:getColumnNumber(startColumn)).Value2 = data[i]
+	--end
 end
 
 --根据起始格子及偏移列数及行数设置值

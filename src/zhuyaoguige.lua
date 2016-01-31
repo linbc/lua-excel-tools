@@ -42,7 +42,6 @@ function main( )
 		end
 		dstSheet:setColumn(dstColumn..3,values)
 		print(U2G(sheetName)..' is ok!')
-		doc:save()
 	end
 	
 	--厦门	湖北	山东	安徽	四川
@@ -54,6 +53,7 @@ function main( )
 	column2sheet('AL3', '安徽', 'W')
 	column2sheet('AM3', '四川', 'O')
 	
+	doc:save()
 	doc:close()
 	print('over!')
 end
