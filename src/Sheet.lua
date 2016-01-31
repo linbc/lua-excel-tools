@@ -143,7 +143,7 @@ function Sheet:getRange(startRange, width, height)
 	--获得起点行号，及起点的列编号
 	local startRow = string.gsub(startRange, '%u+', '')
 	local startColumn = string.gsub(startRange, '%d+', '')
-
+	
 	--把所有的数据组织成一张大表
 	local data = {}
 
@@ -203,6 +203,36 @@ function Sheet:setRange( dstRange, data, row_count, column_count )
 			stringbuilder = {}
 	  	end
 	end
+end
+
+--取得某列的所有集合
+function Sheet:getColumn(startRange, endRow)
+	--要么是个nil要么是个数字
+	assert(not endRow or type(endRow) == 'number', endRow)
+	startRow = startRow or 1
+	endRow = endRow or  (self.sheet.Usedrange.Rows.count - startRow)
+	
+	--TODO:性能优化
+	local range = self:getRange(startRange, 1, endRow)
+	local data = {}
+	for i=1, #range do
+		data[i] = range[i][1]
+	end
+	return data
+end
+
+--从指定的位置开始设置值
+function Sheet:setColumn(startRange, data)
+	--获得起点行号，及起点的列编号
+	return self:pasteTable(startRange, data)
+end
+
+--根据起始格子及偏移列数及行数设置值
+function Sheet:setCell(startRange, column, row, value)
+	--获得起点行号，及起点的列编号
+	local startRow = tonumber(string.gsub(dstRange, '%u+', ''))
+	local startColumn = string.gsub(dstRange, '%d+', '')
+	self.sheet.Cells(startRow + row -1, self:getColumnNumber(startColumn) + column -1).Value2 = value
 end
 
 function Sheet:getUseRange()
