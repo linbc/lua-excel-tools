@@ -32,27 +32,29 @@ function main( )
 	local function column2sheet(column, sheetName, dstColumn)
 		local srcData = fromSheet:getColumn(column)
 		
+		--所有的表格图形编号都是在第一行的第三列
 		local dstSheet = doc:createSheet(sheetName)
 		local a = dstSheet:getColumn('A3')
 		local values = {}
 		for i=1,#a do
 			--idData和fromData 的行号是相同维度的
 			local row = findRowByID(idData, a[i])
-			print(sheetName, a[i], idData[row], srcData[row])
+			--print(sheetName, a[i], idData[row], srcData[row])
 			table.insert(values, srcData[row] and srcData[row] or '')
 		end
 		dstSheet:setColumn(dstColumn..3,values)
+		print(U2G(sheetName)..' is ok!')
 		doc:save()
 	end
 	
 	--厦门	湖北	山东	安徽	四川
 	--AI 	AJ		AK		AL		AM
 	--X		N		M		W		O
-	--column2sheet('AI3', '厦门', 'X')
-	--column2sheet('AJ3', '湖北', 'N')
+	column2sheet('AI3', '厦门', 'X')
+	column2sheet('AJ3', '湖北', 'N')
 	column2sheet('AK3', '山东', 'M')
-	--column2sheet('AL3', '安徽', 'W')
-	--column2sheet('AM3', '四川', 'O')
+	column2sheet('AL3', '安徽', 'W')
+	column2sheet('AM3', '四川', 'O')
 	
 	doc:close()
 	print('over!')

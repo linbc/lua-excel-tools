@@ -1,1 +1,1 @@
-..\bin\lua.exe test.lua
+..\bin\lua.exe zhuyaoguige.lua
