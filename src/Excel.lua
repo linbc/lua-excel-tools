@@ -23,7 +23,7 @@ function Excel:open(path, visible)
 	assert(excel)
 	self.excel = excel
 	
-	excel.Application.DisplayAlerts = true
+	excel.Application.DisplayAlerts = false
 	local book = excel.WorkBooks:Open(G2U(path),nil,ReadOnly)
 	--book.Saved = false
 	self.book = book

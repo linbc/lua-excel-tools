@@ -2,6 +2,7 @@ package.cpath = package.cpath..';../bin/?.dll'
 
 require 'util'
 
+local lfs = require 'lfs'
 local Excel = require 'Excel'
 
 --在数组中找到值
@@ -16,13 +17,10 @@ end
 function main( )
 	local doc = Excel.new()
 	--必须采用全路径,否则会有问题
---	if true then
---		local lfs = require 'lfs'
---		print(lfs.currentdir())
---		
---		return
---	end
-	doc:open(U2G('D:/git/excel-helper/src/主要规格（2016.1.23）.xlsx'))
+	print()
+	local path = U2G(lfs.currentdir()..'\\主要规格（2016.1.23）.xlsx')
+	print('open file:'..path)
+	doc:open(path)
 	
 	--测试一下读取数据后打印输出
 	local fromSheet = doc:getSheet('试验')
