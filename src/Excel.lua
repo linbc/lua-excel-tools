@@ -58,6 +58,17 @@ function Excel:getSheet(name)
 	return nil
 end
 
+function Excel:createSheet(name)
+	local sheet = self:getSheet(name)
+	--没有则创建
+	if sheet then
+		return sheet
+	end
+	sheet = self.book.Sheets:Add()
+	sheet.name = name
+	return Sheet.new(sheet, self)
+end
+
 function Excel:isExist(path)
 	local t=io.open(path, 'r')
 	if not t then
