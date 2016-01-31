@@ -1,1 +1,1 @@
-..\bin\lua.exe main.lua
+..\bin\lua.exe test.lua
