@@ -12,6 +12,16 @@ function table.orderByDesc( input )
 	return output
 end
 
+local function my_assert(isok, s)
+	--local args = {...}
+	if s and not isok then
+		print(string.format('error:%s',s))
+		error(s)
+	else
+		assert(isok)
+	end
+end
+
 --进制转换，英文不行只好用拼音
 --@dec 10进制数据，好吧，只要是数字就呆以了
 --@x 进制，最常见的当然是二、八、十六、进制
@@ -139,11 +149,15 @@ function Sheet:getRange(startRange, width, height)
 	width = width or self.sheet.Usedrange.columns.count
 	height = height or self.sheet.Usedrange.Rows.count
 	--如果格子选太多会导致crash,所以这里必须分页
+	--TODO:这种方式性能还是不行，应该可以借助剪贴板,然后分割文本的方式提高性能
 
 	--获得起点行号，及起点的列编号
 	local startRow = string.gsub(startRange, '%u+', '')
 	local startColumn = string.gsub(startRange, '%d+', '')
-
+	
+	my_assert(tonumber(startRow), string.format("%s %s %s",startRange, startRow, startColumn))
+	--my_assert(tonumber(startColumn), startColumn)
+	
 	--把所有的数据组织成一张大表
 	local data = {}
 
@@ -154,9 +168,8 @@ function Sheet:getRange(startRange, width, height)
 		local cellStr = startColumn..(tonumber(startRow) + #ranges*kStep)
 		local row_count = (i+kStep > height) and (height-i) or kStep
 		if row_count > 0 then
---			print(cellStr, i, row_count)
 			local range = self.sheet:Range(self:getRangeString(cellStr, width, row_count))
-			range:Copy()
+--			range:Copy()
 			table.insert(ranges, {row_count, range})
 			for j=1,row_count do
 				local row = {}
@@ -175,6 +188,10 @@ function Sheet:pasteTable( activate_cell,str_data )
 	--写到剪粘板,然后粘贴即可
 	local content = table.concat(str_data, '\r\n')
 	winapi.set_clipboard(content)
+	self.sheet:Activate()
+	--local range = self.sheet:Range(activate_cell)
+	--local cell = range:Offset(0, 0)
+	--cell:Select()
 	self.sheet:Range(activate_cell):Activate()
 	self.sheet:Paste()
 	--保存一下防止失败
@@ -204,6 +221,42 @@ function Sheet:setRange( dstRange, data, row_count, column_count )
 			stringbuilder = {}
 	  	end
 	end
+end
+
+--取得某列的所有集合
+function Sheet:getColumn(startRange, endRow)
+	--要么是个nil要么是个数字
+	assert(not endRow or type(endRow) == 'number', endRow)
+	startRow = startRow or 1
+	endRow = endRow or  (self.sheet.Usedrange.Rows.count - startRow)
+	
+	--TODO:性能优化
+	local range = self:getRange(startRange, 1, endRow)
+	local data = {}
+	for i=1, #range do
+		local v = range[i][1]
+		data[i] = v and v or ''
+	end
+	return data
+end
+
+--从指定的位置开始设置值
+function Sheet:setColumn(startRange, data)
+	--获得起点行号，及起点的列编号
+	return self:pasteTable(startRange, data)
+	--local startRow = string.gsub(startRange, '%u+', '')
+	--local startColumn = string.gsub(startRange, '%d+', '')
+	--for i=1,#data do
+	--	self.sheet.Cells(tonumber(startRow) + i -1, self:getColumnNumber(startColumn)).Value2 = data[i]
+	--end
+end
+
+--根据起始格子及偏移列数及行数设置值
+function Sheet:setCell(startRange, column, row, value)
+	--获得起点行号，及起点的列编号
+	local startRow = tonumber(string.gsub(dstRange, '%u+', ''))
+	local startColumn = string.gsub(dstRange, '%d+', '')
+	self.sheet.Cells(startRow + row -1, self:getColumnNumber(startColumn) + column -1).Value2 = value
 end
 
 function Sheet:getUseRange()

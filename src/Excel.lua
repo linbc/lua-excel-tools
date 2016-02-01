@@ -23,7 +23,7 @@ function Excel:open(path, visible)
 	assert(excel)
 	self.excel = excel
 	
-	excel.Application.DisplayAlerts = true
+	excel.Application.DisplayAlerts = false
 	local book = excel.WorkBooks:Open(G2U(path),nil,ReadOnly)
 	--book.Saved = false
 	self.book = book
@@ -56,6 +56,17 @@ function Excel:getSheet(name)
 		sheet = e:Next()
 	end
 	return nil
+end
+
+function Excel:createSheet(name)
+	local sheet = self:getSheet(name)
+	--没有则创建
+	if sheet then
+		return sheet
+	end
+	sheet = self.book.Sheets:Add()
+	sheet.name = name
+	return Sheet.new(sheet, self)
 end
 
 function Excel:isExist(path)
