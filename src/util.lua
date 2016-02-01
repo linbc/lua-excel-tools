@@ -38,7 +38,7 @@ function table.orderByDesc( input )
 	return output
 end
 
-local function my_assert(isok, s)
+function my_assert(isok, s)
 	--local args = {...}
 	if s and not isok then
 		print(string.format('error:%s',s))
