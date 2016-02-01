@@ -3,6 +3,7 @@ package.cpath = package.cpath..';../bin/?.dll'
 require 'util'
 
 local Excel = require 'Excel'
+local lfs = require 'lfs'
 
 function test_write( doc )
 	--测试一下写入数据
@@ -49,16 +50,10 @@ end
 function main( )
 	local doc = Excel.new()
 	--必须采用全路径,否则会有问题
---	if true then
---		local lfs = require 'lfs'
---		print(lfs.currentdir())
---		
---		return
---	end
-	doc:open(U2G('D:/git/excel-helper/src/../t.xlsx'))
+	doc:open(U2G(lfs.currentdir()..'/../t.xlsx'))
 	assert(doc)
 	test_write(doc)
-	--testSetColumn(doc)
+	testSetColumn(doc)
 	
 	doc:close()
 	print('over!')
