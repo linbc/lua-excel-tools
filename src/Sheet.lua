@@ -1,77 +1,3 @@
--------------------------------------------------------------
--- function
-
---数组倒序排列
-function table.orderByDesc( input )
-	local output = {}
-	local count = #input
-	while count > 0 do
-		table.insert(output, input[count] )
-		count = count -1 
-	end
-	return output
-end
-
-local function my_assert(isok, s)
-	--local args = {...}
-	if s and not isok then
-		print(string.format('error:%s',s))
-		error(s)
-	else
-		assert(isok)
-	end
-end
-
---进制转换，英文不行只好用拼音
---@dec 10进制数据，好吧，只要是数字就呆以了
---@x 进制，最常见的当然是二、八、十六、进制
-function math.dec2X( dec, x )
-	--计算结果存储在这里
-	local new_number = {}
-
-	--算法如下：
-		--9527 = 9*(10^3)+5*(10^2)+2*(10^1)+7*(10^0)
-		--7 = 9527%10, 2 = (9527-7)%100/100
-		--f(n) = (dec % (x^i) - f(n-1))/x
-		--f(0) = 0
-	--a参数代表第几位，返回是否继续
-	local function f( a )
-		assert(a >= 1)
-		local mod = dec % math.pow(x, a)
-		local last_mod = (a == 1) and 0 or assert(new_number[a-1])
-		new_number[a] = (mod - last_mod)/math.pow(x, a - 1)
-		--取整数部分
-		new_number[a] = math.modf(new_number[a])
-		return mod ~= dec
-	end
-	--该函数取得某位值
-	local i = 1
-	while f(i) do
-		i = i + 1
-	end
-	
-	return new_number
-end
-
---将某个数据转成X进制
---以 9527，10进制为例，{7, 2, 5, 9}
-function math.numberTable2X(  number_tbl,x )
-	local result = 0
-	for i,v in ipairs(number_tbl) do
-		result = result + v*math.pow(x, i - 1)
-	end
-	return result
-end
-
--- local function test_Dec2X ()
--- 	local kTestNumber = 9527
--- 	local n1 = math.dec2X(kTestNumber, 10)
--- 	-- table.foreach(n1, function ( _,v )
--- 	-- 	print(v)
--- 	-- end)
--- 	assert(kTestNumber == math.numberTable2X(n1, 10))
--- end
--- test_Dec2X()
 
 -------------------------------------------------------------
 -- class Sheet
@@ -188,6 +114,8 @@ function Sheet:pasteTable( activate_cell,str_data )
 	--写到剪粘板,然后粘贴即可
 	local content = table.concat(str_data, '\r\n')
 	winapi.set_clipboard(content)
+
+	--如果没有这一句,那么换一个工作表就会失败
 	self.sheet:Activate()
 	--local range = self.sheet:Range(activate_cell)
 	--local cell = range:Offset(0, 0)
@@ -199,6 +127,10 @@ function Sheet:pasteTable( activate_cell,str_data )
 end
 
 --传入一个table设置到相应的格子上面
+--@dstRange 目标单元格
+--@data 所有数据的集合
+--@row_count 需要修改的行数量,用于计算偏移
+--@column_count 列数
 function Sheet:setRange( dstRange, data, row_count, column_count )
 	dstRange = dstRange or 'A1'	
 
@@ -244,11 +176,20 @@ end
 function Sheet:setColumn(startRange, data)
 	--获得起点行号，及起点的列编号
 	return self:pasteTable(startRange, data)
+
+	--以下是以单元格的方式操作性能较差
 	--local startRow = string.gsub(startRange, '%u+', '')
 	--local startColumn = string.gsub(startRange, '%d+', '')
 	--for i=1,#data do
 	--	self.sheet.Cells(tonumber(startRow) + i -1, self:getColumnNumber(startColumn)).Value2 = data[i]
 	--end
+end
+
+function Sheet:getCell( startRange, column, row )
+	--获得起点行号，及起点的列编号
+	local startRow = tonumber(string.gsub(dstRange, '%u+', ''))
+	local startColumn = string.gsub(dstRange, '%d+', '')
+	return self.sheet.Cells(startRow + row -1, self:getColumnNumber(startColumn) + column -1).Value2
 end
 
 --根据起始格子及偏移列数及行数设置值
